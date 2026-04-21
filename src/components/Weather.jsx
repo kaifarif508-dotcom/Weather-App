@@ -67,7 +67,7 @@ const Weather = () => {
       audioRef.current.currentTime = 0
     }
 
-  }, [weather])
+  }, [isRain])
 
   // 🌍 AUTO LOAD CITY
   useEffect(() => {
@@ -76,34 +76,55 @@ const Weather = () => {
   }, [])
 
   return (
-    <div className='relative w-full px-10 py-10 my-20 overflow-hidden bg-gray-200 shadow-2xl mx-60 rounded-2xl h-180'>
+    <div className="flex items-center justify-center min-h-screen px-3 bg-gray-300 sm:px-6">
 
-      {/* 🎧 SOUND */}
-      <audio ref={audioRef} src="/sounds/thunder.mp3" />
+      {/* MAIN CONTAINER */}
+      <div className="relative w-full max-w-6xl p-4 my-10 overflow-hidden bg-gray-200 shadow-2xl rounded-2xl sm:p-6 md:p-10">
 
-      {/* 🌧️ WEATHER ANIMATIONS */}
-      {isRain && <Rain />}
-      {isCloud && <Clouds />}
-      {isSun && <Sun />}
+        {/* 🎧 SOUND */}
+        <audio ref={audioRef} src="/sounds/thunder.mp3" />
 
-      {/* UI */}
-      <Navbar search={search} />
+        {/* 🌧️ ANIMATIONS */}
+        {isRain && <Rain />}
+        {isCloud && <Clouds />}
+        {isSun && <Sun />}
 
-      {loading && (
-        <p className="mt-10 text-xl text-center">Loading...</p>
-      )}
+        {/* NAVBAR */}
+        <Navbar search={search} />
 
-      {!loading && weather && (
-        <>
-          <Result result={weather} />
+        {/* LOADING */}
+        {loading && (
+          <p className="mt-10 text-lg text-center sm:text-xl">
+            Loading...
+          </p>
+        )}
 
-          <div className='flex gap-5'>
-            <Card result={weather} />
-            <Forecast result={weather} />
+        {/* CONTENT */}
+        {!loading && weather && (
+          <div className="mt-6 space-y-6">
+
+            {/* RESULT */}
+            <Result result={weather} />
+
+            {/* CARDS + FORECAST */}
+            <div className="flex flex-col gap-5 lg:flex-row">
+
+              {/* CARD */}
+              <div className="w-full lg:w-1/2">
+                <Card result={weather} />
+              </div>
+
+              {/* FORECAST */}
+              <div className="w-full lg:w-1/2">
+                <Forecast result={weather} />
+              </div>
+
+            </div>
+
           </div>
-        </>
-      )}
+        )}
 
+      </div>
     </div>
   )
 }

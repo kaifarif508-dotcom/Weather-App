@@ -17,21 +17,29 @@ ChartJS.register(
   Tooltip
 );
 
-const Forecast = ({result}) => {
-  const forecastDay = result?.forecast?.forecastday?.[0]?.hour || [];
-  if (!forecastDay) {
-  return <p>Loading...</p>;
-}
-const hours = result?.forecast?.forecastday?.[0]?.hour ;
-if(!hours || hours.length === 0){
-  return <p>Loading...</p>
-}
-const labels = hours.slice(7, 17).map((h) =>
-  new Date(h.time).getHours() + ":00"
-);
-const temps = hours.slice(7, 17).map((h) => h.temp_c);
+const Forecast = ({ result }) => {
+
+  const hours = result?.forecast?.forecastday?.[0]?.hour || [];
+
+  if (!hours.length) {
+    return (
+      <p className="text-sm text-center text-gray-500">
+        Loading forecast...
+      </p>
+    );
+  }
+
+  // 🔥 single slice (optimized)
+  const slicedHours = hours.slice(7, 17);
+
+  const labels = slicedHours.map((h) =>
+    new Date(h.time).getHours() + ":00"
+  );
+
+  const temps = slicedHours.map((h) => h.temp_c);
+
   const data = {
-    labels:labels,
+    labels,
     datasets: [
       {
         data: temps,
@@ -40,46 +48,57 @@ const temps = hours.slice(7, 17).map((h) => h.temp_c);
         tension: 0.4,
         pointRadius: 3,
       },
-      {
-        // red points
-        data: [null, null, null, 18, 30, null, null, null, null, null],
-        backgroundColor: "red",
-        pointRadius: 5,
-        showLine: false,
-      },
     ],
   };
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // 👈 important for h-60
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
     },
     scales: {
       x: {
         grid: { display: false },
+        ticks: {
+          maxRotation: 0,
+          autoSkip: true,
+          font: { size: 10 },
+        },
       },
       y: {
         min: 0,
         max: 45,
         ticks: {
           callback: (v) => v + "°",
+          font: { size: 10 },
+        },
+        grid: {
+          color: "#f3f4f6",
         },
       },
     },
   };
 
   return (
-    <div className="w-full p-4 bg-white shadow-md h-60 rounded-2xl">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold">Hourly Forecast</h3>
-        <span className="text-xs text-gray-500">{result.location?.name}</span>
+    <div className="w-full p-3 bg-white shadow-md sm:p-4 rounded-2xl">
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold sm:text-base">
+          Hourly Forecast
+        </h3>
+
+        <span className="text-xs text-gray-500 sm:text-sm">
+          {result?.location?.name ?? "—"}
+        </span>
       </div>
 
-      <div className="h-[calc(100%-30px)]">
+      {/* Chart */}
+      <div className="w-full h-44 sm:h-52 md:h-60">
         <Line data={data} options={options} />
       </div>
+
     </div>
   );
 };
